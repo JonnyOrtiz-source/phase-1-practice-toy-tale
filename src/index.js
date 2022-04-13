@@ -7,6 +7,26 @@ document.addEventListener('DOMContentLoaded', () => {
    const BASE_URL = 'http://localhost:3000';
    const toyForm = document.querySelector('.add-toy-form');
 
+   const addLikes = (e, toyObj, toyLikes) => {
+      e.stopPropagation();
+
+      ++toyObj.likes;
+
+      fetch(`${BASE_URL}/toys/${toyObj.id}`, {
+         method: 'PATCH',
+         headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+         },
+         body: JSON.stringify({ likes: toyObj.likes }),
+      })
+         .then((r) => r.json())
+         .then(
+            (updatedCharObj) =>
+               (toyLikes.textContent = `${updatedCharObj.likes} likes`)
+         );
+   };
+
    const renderToy = (toyObj) => {
       const toyCard = document.createElement('div');
       const toyName = document.createElement('h2');
@@ -25,6 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
       toyBtn.textContent = 'Like';
       toyCard.append(toyName, toyImg, toyLikes, toyBtn);
       toyCollection.appendChild(toyCard);
+
+      toyBtn.addEventListener('click', (e) => {
+         addLikes(e, toyObj, toyLikes);
+      });
    };
 
    const getToys = async () => {
